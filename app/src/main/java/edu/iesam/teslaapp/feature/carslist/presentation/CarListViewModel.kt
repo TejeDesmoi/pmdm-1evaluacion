@@ -17,19 +17,22 @@ class CarListViewModel(
     private val getCarByIdUseCase: GetCarByIdUseCase
 ): ViewModel() {
 
-    //private val _uiState = MutableLiveData<UiState>()
-    //val uiState: LiveData<UiState> = _uiState
+    private val _uiState = MutableLiveData<UiState>()
+    val uiState: LiveData<UiState> = _uiState
 
-    fun buscarCoche(id: String): Car? {
-        //_uiState.value = UiState(getCarByIdUseCase(id))
-        return getCarByIdUseCase(id)
+    fun buscarCoche(id: String) {
+        _uiState.value = UiState(isLoading = true)
+
+        val car = getCarByIdUseCase(id)
+
+        _uiState.value = UiState(car = car, isLoading = false)
     }
 
-    /*data class UiState(
-        private val car: Car? =null,
-        private val isLoading: Boolean = false,
-        private val hasError: Boolean = false
-    )*/
+    data class UiState(
+        val car: Car? =null,
+        val isLoading: Boolean = false,
+        val hasError: Boolean = false
+    )
 
     companion object {
             fun factory(context: Context) = object : ViewModelProvider.Factory {

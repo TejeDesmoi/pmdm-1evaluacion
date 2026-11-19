@@ -9,18 +9,11 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.viewmodel.CreationExtras
 import edu.iesam.teslaapp.R
-import edu.iesam.teslaapp.feature.carslist.data.CarDataRepository
-import edu.iesam.teslaapp.feature.carslist.data.local.CarXmlLocalDataSource
-import edu.iesam.teslaapp.feature.carslist.presentation.CarListViewModel
-import edu.iesam.marvelapp.core.serialization.GsonJsonSerializer
-import edu.iesam.teslaapp.feature.carslist.data.remote.CarApiRemoteDataSource
 import edu.iesam.teslaapp.feature.carslist.domain.Car
-import edu.iesam.teslaapp.feature.carslist.domain.GetCarByIdUseCase
+import edu.iesam.teslaapp.feature.carslist.presentation.CarListViewModel
 
 class CarsListActivity : AppCompatActivity() {
 
@@ -47,35 +40,40 @@ class CarsListActivity : AppCompatActivity() {
         actionFind.setOnClickListener {
             buttonFindClicked(labelCarId.text.toString())
         }
+
+        viewModel.uiState.observe(this){ uiState ->
+            Log.d("MainActivity", uiState.isLoading.toString())
+            bind(uiState)
+        }
+    }
+
+    private fun bind(uiState: CarListViewModel.UiState?) {
+        renderCar(uiState?.car)
     }
 
     private fun buttonFindClicked(carId: String) {
         //el usuario ha pulsado el botón.
         Log.d(CarsListActivity::class.java.simpleName, carId)
-        val car = viewModel.buscarCoche(carId)
-        val carCard = findViewById<LinearLayout>(R.id.car_card)
-        val mensajeError = findViewById<TextView>(R.id.mensaje_error)
-
-        car.let{
-            mensajeError.visibility = TextView.GONE
-            carCard.visibility = LinearLayout.VISIBLE
-            renderCar(car)
-        }
-        if (car == null){
-            carCard.visibility = LinearLayout.GONE
-            mensajeError.visibility = TextView.VISIBLE
-        }
-
+        viewModel.buscarCoche(carId)
     }
 
     private fun renderCar(car: Car?){
+        val carCard = findViewById<LinearLayout>(R.id.car_card)
+        val mensajeError = findViewById<TextView>(R.id.mensaje_error)
         val matriculaLabel = findViewById<TextView>(R.id.matricula_label)
         val marcaLabel = findViewById<TextView>(R.id.marca_label)
         val modeloLabel = findViewById<TextView>(R.id.modelo_label)
 
-        matriculaLabel.text = car?.matricula
-        marcaLabel.text = car?.marca
-        modeloLabel.text = car?.modelo
+        if (car == null) {
+            carCard.visibility = LinearLayout.GONE
+            mensajeError.visibility = TextView.VISIBLE
+        } else {
+            carCard.visibility = LinearLayout.VISIBLE
+            mensajeError.visibility = TextView.GONE
+            matriculaLabel.text = car.matricula
+            marcaLabel.text = car.marca
+            modeloLabel.text = car.modelo
+        }
     }
 
 }
