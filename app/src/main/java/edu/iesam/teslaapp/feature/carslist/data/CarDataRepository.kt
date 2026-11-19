@@ -18,7 +18,7 @@ class CarDataRepository(
     }
 
     override fun findById(id: String): Car? {
-        return localDataSource.findById(id)
+        return remoteDataSource.findById(id)
     }
 
     override fun deleteById(id: String) {

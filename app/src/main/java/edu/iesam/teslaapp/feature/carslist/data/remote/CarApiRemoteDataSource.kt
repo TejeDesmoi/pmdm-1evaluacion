@@ -16,4 +16,8 @@ class CarApiRemoteDataSource {
         )
     }
 
+    fun findById(id: String): Car? {
+        return getAll().find { it.id == id }
+    }
+
 }
