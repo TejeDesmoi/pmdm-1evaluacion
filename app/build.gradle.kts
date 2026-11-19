@@ -41,6 +41,7 @@ dependencies {
 
     implementation(libs.gson)
 
+    testImplementation(libs.mockito)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
